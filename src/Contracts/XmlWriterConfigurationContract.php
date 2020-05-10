@@ -2,8 +2,6 @@
 
 namespace Skraeda\Xmlary\Contracts;
 
-use DOMDocument;
-
 /**
  * Interface to define XML Writer configuration.
  *
