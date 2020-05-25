@@ -199,7 +199,7 @@ outputs
 ```
 
 ### Bootstrap
-You can use the `bootstrap` method on the writer to get a writer configured with default keywords.
+You can use the `bootstrap` method on the writer to configure it with default keywords.
 
 #### Keywords
 * `attributes`: Set element attributes
