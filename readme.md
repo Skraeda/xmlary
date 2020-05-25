@@ -150,7 +150,6 @@ echo (new XmlWriter)
     ->toString(['Root' => false]);
 ```
 
-
 ### Middleware
 You can add middleware before or after `DOMDocument` creation.
 
