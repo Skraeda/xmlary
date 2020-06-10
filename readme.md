@@ -1,5 +1,6 @@
 # Xmlary
 ![CircleCI](https://img.shields.io/circleci/build/github/Skraeda/xmlary)
+![Codecov](https://img.shields.io/codecov/c/github/Skraeda/xmlary)
 ![Version Badge](https://img.shields.io/packagist/v/skraeda/xmlary)
 ![License Badge](https://img.shields.io/github/license/Skraeda/xmlary?color=1f59c4)
 
