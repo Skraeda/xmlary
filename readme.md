@@ -6,7 +6,7 @@
 
 This package is a set of XML utilities for PHP.
 
-## Examples
+## Writer examples
 Examples of how the writer converts arrays to XML.
 
 Use `toString` to get the XML body string or `toDomDocument` to get a PHP DOMDocument object.
@@ -237,19 +237,185 @@ $arr = [
 echo $writer->toString($arr);
 ```
 
-### Utilities
-#### XmlSerializable
+## Reader examples
+Examples of how the reader converts XML to arrays.
+
+### Example 1
+```php
+$xml = <<<XML
+<Root>
+    <Element id="1">Value</Element>
+</Root>
+XML;
+
+(new XmlReader)->parse($xml));
+```
+
+outputs
+
+```php
+[
+    'Root' => [
+        'Element' => [
+            '@attributes' => [
+                'id' => '1'
+            ],
+            '@value' => Value
+        ]
+    ]
+]
+```
+
+### Example 2
+```php
+$xml = <<<XML
+<Order>
+    <Items>
+        <Item id="1">
+            <Price>2.00</Price>
+            <Type>Drink</Type>
+            <Supplier>
+                <Organization>
+                    <OrganizationName />
+                </Organization>
+            </Supplier>
+        </Item>
+        <Item id="3">
+            <Price><![CDATA[1.00]]></Price>
+            <Type>Misc</Type>
+            <Supplier />
+        </Item>
+    </Items>
+</Order>
+XML;
+```
+
+outputs
+
+```php
+[
+    'Order' => [
+        'Items' => [
+            'Item' => [
+                [
+                    '@attributes' => [
+                        'id' => 1
+                    ],
+                    'Price' => [
+                        '@value' => '2.00'
+                    ],
+                    'Supplier' => [
+                        'Organization' => [
+                            'OrganizationName' => [
+                                '@value' => null
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    '@attributes' => [
+                        'id' => 3
+                    ],
+                    'Price' => [
+                        '@value' => '1.00'
+                    ]
+                    'Type' => [
+                        '@value' => 'Misc'
+                    ],
+                    'Supplier' => [
+                        '@value' => null
+                    ]
+                ]
+            ]
+        ]
+    ]
+]
+```
+
+### Example 3
+You can provide a configuration mapping for the nodes for some basic changes to the generated array.
+
+```php
+use Skraeda\Xmlary\XmlReaderNodeConfiguration as Config;
+
+$xml = <<<XML
+<Root>
+    <Element>1</Element>
+    <Inner>&lt;Sheet&gt;&lt;Data&gt;2&lt;/Data&gt;&lt;/Sheet&gt;</Inner>
+</Root>
+XML;
+
+$reader = new XmlReader;
+
+$config = [
+    'Root' => [
+        // Provide config to rename Root element
+        '@config' => new Config('NewRoot'),
+        'Element' => [
+            // Provide config to ensure Element is always an array element and add custom value converter to cast to int and add +2 to the value.
+            '@config' => new Config(null, true, function ($oldValue) {
+                return ((int) $oldValue) + 2;
+            })
+        ],
+        'Inner' => [
+            '@config' => new Config(null, false, function ($oldValue) use ($reader) {
+                return $reader->parse(html_entity_decode($oldValue));
+            }, function (XmlReaderNode $node) {
+                // Callback handler to execute when the ReaderNode is created..
+            })
+        ]
+    ]
+];
+
+$reader->parse($xml, $config);
+```
+
+outputs
+
+```php
+[
+    'NewRoot' => [
+        'Element' => [
+            [
+                '@value' => 3
+            ]
+        ],
+        'Inner' => [
+            '@value' => [
+                'Sheet' => [
+                    'Data' => [
+                        '@value' => '2'
+                    ]
+                ]
+            ]
+        ]
+    ]
+]
+```
+
+You can create custom config classes to reduce repitition if you need.
+
+Either extend the reader node configuration class or implement the interface.
+
+## Reader configuration
+This section describes how you can customize the `XmlReader`.
+
+### Interfaces
+You can set a custom configuration object through the constructor or setter methods.
+
+## Utilities
+### XmlSerializable
 Interface you can define on a model so it can be formatted as XML by an `XmlWriter`.
 
 You need to define `xmlSerialize` on your model which should return an array similar to the above examples.
 
-#### XmlSerialize
+### XmlSerialize
 Trait you can add on a model to give it a default `xmlSerialize` handler using reflection.
 
-#### XmlMessage
+### XmlMessage
 Abstract base class you can extend to give your object a default `xmlSerialize` handler using reflection.
 
-##### Example
+#### Example
 
 ```php
 use Skraeda\Xmlary\XmlMessage;

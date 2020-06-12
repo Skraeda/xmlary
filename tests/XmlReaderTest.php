@@ -6,6 +6,7 @@ use DOMAttr;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Skraeda\Xmlary\Contracts\XmlReaderConfigurationContract;
+use Skraeda\Xmlary\Exceptions\XmlReaderException;
 use Skraeda\Xmlary\XmlReader;
 use Skraeda\Xmlary\XmlReaderConfiguration;
 use Skraeda\Xmlary\XmlReaderNodeConfiguration;
@@ -57,6 +58,14 @@ class XmlReaderTest extends TestCase
         $reader = new XmlReader(new XmlReaderConfiguration);
         $result = $reader->parse($xml, $config);
         $this->assertEquals($expectedOutput, $result);
+    }
+
+    /** @test */
+    public function itThrowsReaderExceptionIfThereIsAnError()
+    {
+        $this->expectException(XmlReaderException::class);
+        $reader = new XmlReader();
+        $reader->parse('{"xml": "<Root>JSON</Root>}');
     }
 
     /**

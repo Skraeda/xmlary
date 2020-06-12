@@ -3,10 +3,10 @@
 namespace Skraeda\Xmlary\Exceptions;
 
 /**
- * Exception for an XML writer exceptions.
+ * Exception for an XML reader exceptions.
  *
  * @author Gunnar Örn Baldursson <gunnar@sjukraskra.is>
  */
-class XmlWriterException extends XmlaryException
+class XmlReaderException extends XmlaryException
 {
 }

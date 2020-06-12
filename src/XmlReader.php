@@ -8,6 +8,8 @@ use DOMElement;
 use DOMNode;
 use Skraeda\Xmlary\Contracts\XmlReaderConfigurationContract;
 use Skraeda\Xmlary\Contracts\XmlReaderContract;
+use Skraeda\Xmlary\Exceptions\XmlReaderException;
+use Throwable;
 
 /**
  * XmlReader implementation.
@@ -38,10 +40,14 @@ class XmlReader implements XmlReaderContract
      */
     public function parse(string $xml, array $config = []): array
     {
-        $doc = new DOMDocument;
-        $doc->loadXML($xml);
-        $root = $this->buildReaderNodeTree($doc->documentElement, $config);
-        return [ $root->getName() => $this->treeToArray($root) ];
+        try {
+            $doc = new DOMDocument;
+            $doc->loadXML($xml);
+            $root = $this->buildReaderNodeTree($doc->documentElement, $config);
+            return [ $root->getName() => $this->treeToArray($root) ];
+        } catch (Throwable $e) {
+            throw XmlReaderException::wrap($e);
+        }
     }
 
     /**
