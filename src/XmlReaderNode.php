@@ -50,6 +50,7 @@ class XmlReaderNode
     {
         $this->node = $node;
         $this->config = $config ?? new XmlReaderNodeConfiguration;
+        $this->config->callback($this);
     }
 
     /**

@@ -46,6 +46,7 @@ class XmlReaderNodeTest extends TestCase
     /** @test */
     public function itHasConfiguration()
     {
+        $this->config->shouldReceive('callback');
         $node = new XmlReaderNode(Mockery::mock(DOMNode::class), $this->config);
         $this->assertEquals($this->config, $node->getConfiguration());
     }
@@ -102,5 +103,12 @@ class XmlReaderNodeTest extends TestCase
         $node->addChild(new XmlReaderNode(new DOMElement('def')));
         $this->assertCount(1, $node->getChildren());
         $this->assertCount(1, $node->getChildren()['def']);
+    }
+
+    /** @test */
+    public function itCanTellWhenItIsALeaf()
+    {
+        $node = new XmlReaderNode(new DOMElement('abc'));
+        $this->assertTrue($node->isLeaf());
     }
 }
