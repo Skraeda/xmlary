@@ -79,8 +79,7 @@ class XmlWriterTest extends TestCase
     /** @test */
     public function itCanWriteXmlSerializableToXml()
     {
-        $o = new class implements XmlSerializable
-        {
+        $o = new class implements XmlSerializable {
             public function xmlSerialize(): array
             {
                 return ['Foo' => 'Bar'];
@@ -129,7 +128,7 @@ class XmlWriterTest extends TestCase
     }
 
     /** @test */
-    public function itCanChangeValidator()
+    public function itCanChangeConfiguration()
     {
         $writer = new XmlWriter(new XmlWriterConfiguration, new XmlValueConverter, new XmlValidator);
         $writer->setConfiguration($this->config);
@@ -137,7 +136,7 @@ class XmlWriterTest extends TestCase
     }
 
     /** @test */
-    public function itCanChangeConfiguration()
+    public function itCanChangeValidator()
     {
         $writer = new XmlWriter(new XmlWriterConfiguration, new XmlValueConverter, new XmlValidator);
         $writer->setValidator($this->validator);
