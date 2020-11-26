@@ -16,9 +16,7 @@ class XmlMessageTest extends TestCase
     /** @test */
     public function isThereASyntaxError()
     {
-        $o = new class extends XmlMessage
-        {
-            
+        $o = new class extends XmlMessage {
         };
 
         $this->assertTrue(is_object($o));
@@ -27,8 +25,7 @@ class XmlMessageTest extends TestCase
     /** @test */
     public function itCanSerializePrimitives()
     {
-        $o = new class extends XmlMessage
-        {
+        $o = new class extends XmlMessage {
             protected $number = 1;
             protected $text = 'text';
             protected $flag = false;
@@ -42,8 +39,7 @@ class XmlMessageTest extends TestCase
     /** @test */
     public function itCanSerializeArrays()
     {
-        $o = new class extends XmlMessage
-        {
+        $o = new class extends XmlMessage {
             protected $arr;
 
             public function __construct()
@@ -58,16 +54,14 @@ class XmlMessageTest extends TestCase
     /** @test */
     public function itCanSerializeXmlSerializables()
     {
-        $nested = new class implements XmlSerializable
-        {
+        $nested = new class implements XmlSerializable {
             public function xmlSerialize(): array
             {
                 return ['value' => 'foo'];
             }
         };
 
-        $o = new class($nested) extends XmlMessage
-        {
+        $o = new class($nested) extends XmlMessage {
             protected $nested;
 
             public function __construct($nested)
@@ -82,10 +76,24 @@ class XmlMessageTest extends TestCase
     /** @test */
     public function itCanSerializeNoProps()
     {
-        $o = new class extends XmlMessage
-        {
+        $o = new class extends XmlMessage {
         };
         $arr = $o->xmlSerialize()[get_class($o)];
         $this->assertEmpty($arr);
+    }
+
+    /** @test */
+    public function itCanMutateValues()
+    {
+        $o = new class extends XmlMessage {
+            protected $prop = 'singer';
+
+            protected function propMutator()
+            {
+                return 32;
+            }
+        };
+        $arr = $o->xmlSerialize()[get_class($o)];
+        $this->assertEquals(32, $arr['prop']);
     }
 }

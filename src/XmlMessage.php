@@ -13,4 +13,22 @@ use Skraeda\Xmlary\Traits\XmlSerialize;
 abstract class XmlMessage implements XmlSerializable
 {
     use XmlSerialize;
+
+    /**
+     * Optional value mutator before a property is converted to XML element
+     *
+     * @param string $prop
+     * @param mixed $val
+     * @return mixed
+     */
+    protected function xmlSerializeMutateValue($prop, $val)
+    {
+        $mutator = "${prop}Mutator";
+
+        if (method_exists($this, $mutator)) {
+            return $this->{$mutator}($val);
+        }
+
+        return $val;
+    }
 }

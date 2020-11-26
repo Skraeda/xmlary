@@ -25,7 +25,8 @@ trait XmlSerialize
 
         foreach ($c->getProperties() as $prop) {
             $prop->setAccessible(true);
-            $xml[$prop->getName()] = $this->xmlSerializeValue($prop->getValue($this));
+            $value = $this->xmlSerializeMutateValue($prop->getName(), $prop->getValue($this));
+            $xml[$prop->getName()] = $this->xmlSerializeValue($value);
         }
 
         return [ $c->getShortName() => $xml ];
@@ -44,5 +45,17 @@ trait XmlSerialize
         }
 
         return $val instanceof XmlSerializable ? $val->xmlSerialize() : $val;
+    }
+
+    /**
+     * Optional value mutator before a property is converted to XML element
+     *
+     * @param string $prop
+     * @param mixed $val
+     * @return mixed
+     */
+    protected function xmlSerializeMutateValue($prop, $val)
+    {
+        return $val;
     }
 }
