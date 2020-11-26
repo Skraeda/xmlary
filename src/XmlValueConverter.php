@@ -16,6 +16,10 @@ class XmlValueConverter implements XmlValueConverterContract
      */
     public function convert($value)
     {
+        if (is_bool($value)) {
+            return $value ? '1' : '0';
+        }
+        
         return htmlspecialchars((string) $value);
     }
 }

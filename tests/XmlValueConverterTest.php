@@ -25,5 +25,6 @@ class XmlValueConverterTest extends TestCase
         $this->assertEquals("string", $converter->convert("string"));
         $this->assertEquals("1", $converter->convert(1));
         $this->assertEquals("1", $converter->convert(true));
+        $this->assertEquals('0', $converter->convert(false));
     }
 }
