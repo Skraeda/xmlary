@@ -36,6 +36,8 @@ class ValueKeyword implements XmlKeyword
      */
     public function handle(DOMDocument $doc, DOMNode $parent, $value): void
     {
-        $parent->appendChild($doc->createTextNode($this->converter->convert($value)));
+        if ($value !== null) {
+            $parent->appendChild($doc->createTextNode($this->converter->convert($value)));
+        }
     }
 }

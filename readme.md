@@ -432,18 +432,44 @@ class MyMessage extends XmlMessage
 
     public $Inner;
 
+    public $Changer = 'WillBeChanged';
+
+    public $Attrs = null;
+
     public function __construct(?MyMessage $Inner = null)
     {
         $this->Array = ['Field' => 'Value'];
         $this->Inner = $Inner;
     }
+
+    public function ChangerMutator()
+    {
+        return 'ChangedValue';
+    }
+
+    // Uses AttributeKeyword and ValueKeyword
+    public function AttrsAttributes()
+    {
+        return [
+            'value' => 'AttributeValue'
+        ];
+    }
+
+    // Create local namespace, uses NamespaceKeyword
+    public function namespace()
+    {
+        return 'o';
+    }
 }
 
-echo $writer->toString(new MyMessage(new MyMessage));
+echo (new XmlWriter)
+    ->bootstrap()
+    ->extend('namespace', new NamespaceKeyword(['o' => 'http://example.com' ]))
+    ->toString(new MyMessage(new MyMessage));
 ```
 outputs
 ```xml
-<MyMessage>
+<MyMessage xmlns:o="http://example.com">
     <Public>PublicValue</Public>
     <Protected>ProtectedValue</Protected>
     <Private>PrivateValue</Private>
@@ -459,8 +485,12 @@ outputs
                 <Field>Value</Field>
             </Array>
             <Inner/>
+            <Changer>ChangedValue</Changer>
+            <Attrs name="AttributeValue"/>
         </MyMessage>
     </Inner>
+    <Changer>ChangedValue</Changer>
+    <Attrs name="AttributeValue">
 </MyMessage>
 ```
 

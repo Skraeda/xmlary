@@ -59,4 +59,25 @@ class ValueKeywordTest extends TestCase
         $xml = $this->document->saveXML($this->document->documentElement);
         $this->assertEquals("<Value>$value</Value>", $xml);
     }
+
+    /** @test */
+    public function itCanCreateEmptyValue()
+    {
+        $value = null;
+        $keyword = new ValueKeyword($this->converter);
+        $keyword->handle($this->document, $this->node, $value);
+        $xml = $this->document->saveXML($this->document->documentElement);
+        $this->assertEquals("<Value/>", $xml);
+    }
+
+    /** @test */
+    public function itCanCreateEmptyStringValue()
+    {
+        $value = '';
+        $this->converter->shouldReceive('convert')->with($value)->andReturn($value);
+        $keyword = new ValueKeyword($this->converter);
+        $keyword->handle($this->document, $this->node, $value);
+        $xml = $this->document->saveXML($this->document->documentElement);
+        $this->assertEquals("<Value></Value>", $xml);
+    }
 }
