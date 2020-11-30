@@ -96,4 +96,46 @@ class XmlMessageTest extends TestCase
         $arr = $o->xmlSerialize()[get_class($o)];
         $this->assertEquals(32, $arr['prop']);
     }
+
+    /** @test */
+    public function itCanAddAttributesToValues()
+    {
+        $o = new class extends XmlMessage {
+            protected $prop = 'singer';
+
+            protected function propAttributes()
+            {
+                return ['name' => 'Joe'];
+            }
+        };
+        $arr = $o->xmlSerialize()[get_class($o)];
+        $this->assertEquals('singer', $arr['prop']['@value']);
+        $this->assertEquals('Joe', $arr['prop']['@attributes']['name']);
+    }
+
+    /** @test */
+    public function itCanDeclareNamespacesAsString()
+    {
+        $o = new class extends XmlMessage {
+            protected function namespace()
+            {
+                return 'a';
+            }
+        };
+        $arr = $o->xmlSerialize()[get_class($o)];
+        $this->assertEquals(['a'], $arr['@namespace']);
+    }
+
+    /** @test */
+    public function itCanDeclareNamespacesAsArray()
+    {
+        $o = new class extends XmlMessage {
+            protected function namespace()
+            {
+                return ['a'];
+            }
+        };
+        $arr = $o->xmlSerialize()[get_class($o)];
+        $this->assertEquals(['a'], $arr['@namespace']);
+    }
 }

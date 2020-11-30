@@ -16,8 +16,7 @@ class XmlSerializeTest extends TestCase
     /** @test */
     public function itCanSerializePrimitives()
     {
-        $o = new class
-        {
+        $o = new class {
             use XmlSerialize;
 
             protected $number = 1;
@@ -33,8 +32,7 @@ class XmlSerializeTest extends TestCase
     /** @test */
     public function itCanSerializeArrays()
     {
-        $o = new class
-        {
+        $o = new class {
             use XmlSerialize;
 
             protected $arr;
@@ -51,16 +49,14 @@ class XmlSerializeTest extends TestCase
     /** @test */
     public function itCanSerializeXmlSerializables()
     {
-        $nested = new class implements XmlSerializable
-        {
+        $nested = new class implements XmlSerializable {
             public function xmlSerialize(): array
             {
                 return ['value' => 'foo'];
             }
         };
 
-        $o = new class($nested)
-        {
+        $o = new class($nested) {
             use XmlSerialize;
 
             protected $nested;
@@ -77,11 +73,48 @@ class XmlSerializeTest extends TestCase
     /** @test */
     public function itCanSerializeNoProps()
     {
-        $o = new class
-        {
+        $o = new class {
             use XmlSerialize;
         };
         $arr = $o->xmlSerialize()[get_class($o)];
         $this->assertEmpty($arr);
+    }
+
+    /** @test */
+    public function itCanSerializeWithAttributes()
+    {
+        $o = new class {
+            use XmlSerialize;
+
+            protected $el = 'value';
+
+            protected function xmlSerializeAttributes(string $prop): array
+            {
+                return [
+                    'foo' => 'bar'
+                ];
+            }
+        };
+        $arr = $o->xmlSerialize()[get_class($o)];
+        $this->assertEquals('value', $arr['el']['@value']);
+        $this->assertEquals('bar', $arr['el']['@attributes']['foo']);
+    }
+
+    /** @test */
+    public function itCanSerializeWithNamespace()
+    {
+        $o = new class {
+            use XmlSerialize;
+
+            protected $el = 'value';
+
+            protected function xmlSerializeNamespaces(): array
+            {
+                return ['o', 'p'];
+            }
+        };
+        $arr = $o->xmlSerialize()[get_class($o)];
+        $this->assertEquals('value', $arr['el']);
+        $this->assertEquals(['o', 'p'], $arr['@namespace']);
     }
 }

@@ -21,14 +21,59 @@ abstract class XmlMessage implements XmlSerializable
      * @param mixed $val
      * @return mixed
      */
-    protected function xmlSerializeMutateValue($prop, $val)
+    protected function xmlSerializeMutateValue(string $prop, $val)
     {
         $mutator = "${prop}Mutator";
 
-        if (method_exists($this, $mutator)) {
-            return $this->{$mutator}($val);
+        if (!method_exists($this, $mutator)) {
+            return $val;
+        }
+        
+        return $this->{$mutator}($val);
+    }
+
+    /**
+     * Optionally add attributes to a property before it is converted to XML element
+     *
+     * @param string $prop
+     * @return array
+     */
+    protected function xmlSerializeAttributes(string $prop): array
+    {
+        $accessor = "${prop}Attributes";
+
+        if (!method_exists($this, $accessor)) {
+            return [];
+        }
+        
+        return $this->{$accessor}();
+    }
+
+    /**
+     * Optional namespace declarations
+     *
+     * @return array
+     */
+    protected function xmlSerializeNamespaces(): array
+    {
+        $ns = $this->namespace();
+
+        if (is_array($ns)) {
+            return $ns;
+        } elseif (is_string($ns)) {
+            return [ $ns ];
         }
 
-        return $val;
+        return [];
+    }
+
+    /**
+     * Optionally define namespace for this Message
+     *
+     * @return mixed
+     */
+    protected function namespace()
+    {
+        return null;
     }
 }
