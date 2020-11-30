@@ -26,18 +26,26 @@ trait XmlSerialize
         foreach ($c->getProperties() as $prop) {
             $prop->setAccessible(true);
             $value = $this->xmlSerializeMutateValue($prop->getName(), $prop->getValue($this));
+            $tag = implode(':', array_filter([
+                $this->xmlSerializeNamespacePrefix($prop->getName()),
+                $this->xmlSerializePropToTag($prop->getName())
+            ]));
             if ($attributes = $this->xmlSerializeAttributes($prop->getName())) {
-                $xml[$prop->getName()] = [
+                $xml[$tag] = [
                     $this->xmlSerializeAttributeKeyword()   => $attributes,
                     $this->xmlSerializeValueKeyword()       => $this->xmlSerializeValue($value)
                 ];
             } else {
-                $xml[$prop->getName()] = $this->xmlSerializeValue($value);
+                $xml[$tag] = $this->xmlSerializeValue($value);
             }
         }
 
         if ($namespaces = $this->xmlSerializeNamespaces()) {
             $xml[$this->xmlSerializeNamespaceKeyword()] = $namespaces;
+        }
+
+        if ($attributes = $this->xmlSerializeAttributes()) {
+            $xml['@attributes'] = $attributes;
         }
 
         return [ $c->getShortName() => $xml ];
@@ -83,12 +91,34 @@ trait XmlSerialize
     /**
      * Optional attribute declarations
      *
-     * @param string $prop
+     * @param string|null $prop
      * @return array
      */
-    protected function xmlSerializeAttributes(string $prop): array
+    protected function xmlSerializeAttributes(?string $prop = null): array
     {
         return [];
+    }
+
+    /**
+     * Optionally set a namespace prefix to tags generated
+     *
+     * @param string $prop
+     * @return string
+     */
+    protected function xmlSerializeNamespacePrefix(string $prop): string
+    {
+        return '';
+    }
+
+    /**
+     * Optionally define rules to convert a prop name to a tag
+     *
+     * @param string $prop
+     * @return string
+     */
+    protected function xmlSerializePropToTag(string $prop): string
+    {
+        return $prop;
     }
 
     /**

@@ -442,34 +442,37 @@ class MyMessage extends XmlMessage
         $this->Inner = $Inner;
     }
 
-    public function ChangerMutator()
+    protected function ChangerMutator()
     {
         return 'ChangedValue';
     }
 
     // Uses AttributeKeyword and ValueKeyword
-    public function AttrsAttributes()
+    protected function AttrsAttributes()
     {
         return [
             'value' => 'AttributeValue'
         ];
     }
 
-    // Create local namespace, uses NamespaceKeyword
-    public function namespace()
+    protected function AttrsTag()
     {
-        return 'o';
+        return 'AttributeTag';
+    }
+
+    protected function attributes()
+    {
+        return [
+            'foo' => 'bar'
+        ];
     }
 }
 
-echo (new XmlWriter)
-    ->bootstrap()
-    ->extend('namespace', new NamespaceKeyword(['o' => 'http://example.com' ]))
-    ->toString(new MyMessage(new MyMessage));
+echo $writer->toString(new MyMessage(new MyMessage));
 ```
 outputs
 ```xml
-<MyMessage xmlns:o="http://example.com">
+<MyMessage foo="bar">
     <Public>PublicValue</Public>
     <Protected>ProtectedValue</Protected>
     <Private>PrivateValue</Private>
@@ -477,7 +480,7 @@ outputs
         <Field>Value</Field>
     </Array>
     <Inner>
-        <MyMessage>
+        <MyMessage foo="bar">
             <Public>PublicValue</Public>
             <Protected>ProtectedValue</Protected>
             <Private>PrivateValue</Private>
@@ -486,11 +489,11 @@ outputs
             </Array>
             <Inner/>
             <Changer>ChangedValue</Changer>
-            <Attrs name="AttributeValue"/>
+            <AttributeTag name="AttributeValue"/>
         </MyMessage>
     </Inner>
     <Changer>ChangedValue</Changer>
-    <Attrs name="AttributeValue">
+    <AttributeTag name="AttributeValue">
 </MyMessage>
 ```
 

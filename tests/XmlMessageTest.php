@@ -114,28 +114,67 @@ class XmlMessageTest extends TestCase
     }
 
     /** @test */
-    public function itCanDeclareNamespacesAsString()
+    public function itCanAddElementNamespace()
     {
         $o = new class extends XmlMessage {
-            protected function namespace()
+            protected $el = 'foo';
+            
+            protected function namespace(): string
             {
                 return 'a';
             }
         };
         $arr = $o->xmlSerialize()[get_class($o)];
-        $this->assertEquals(['a'], $arr['@namespace']);
+        $this->assertEquals('foo', $arr['a:el']);
     }
 
     /** @test */
-    public function itCanDeclareNamespacesAsArray()
+    public function itCanConvertElementTagNames()
     {
         $o = new class extends XmlMessage {
-            protected function namespace()
+            protected $el = 'foo';
+            
+            protected function elTag(): string
             {
-                return ['a'];
+                return 'ELEMENT';
             }
         };
         $arr = $o->xmlSerialize()[get_class($o)];
-        $this->assertEquals(['a'], $arr['@namespace']);
+        $this->assertEquals('foo', $arr['ELEMENT']);
+    }
+
+    /** @test */
+    public function itCanDefineNamespaceForSomeElements()
+    {
+        $o = new class extends XmlMessage {
+            protected $el = 'foo';
+            protected $bar = '321';
+            
+            protected function elNamespace(): string
+            {
+                return 'b';
+            }
+
+            protected function namespace(): string
+            {
+                return 'c';
+            }
+        };
+        $arr = $o->xmlSerialize()[get_class($o)];
+        $this->assertEquals('foo', $arr['b:el']);
+        $this->assertEquals('321', $arr['c:bar']);
+    }
+
+    /** @test */
+    public function itCanDefineAttributesForRootElement()
+    {
+        $o = new class extends XmlMessage {
+            protected function attributes(): array
+            {
+                return ['foo' => 'bar'];
+            }
+        };
+        $arr = $o->xmlSerialize()[get_class($o)];
+        $this->assertEquals('bar', $arr['@attributes']['foo']);
     }
 }

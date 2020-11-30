@@ -38,8 +38,12 @@ abstract class XmlMessage implements XmlSerializable
      * @param string $prop
      * @return array
      */
-    protected function xmlSerializeAttributes(string $prop): array
+    protected function xmlSerializeAttributes(?string $prop = null): array
     {
+        if (!$prop) {
+            return $this->attributes();
+        }
+
         $accessor = "${prop}Attributes";
 
         if (!method_exists($this, $accessor)) {
@@ -50,30 +54,56 @@ abstract class XmlMessage implements XmlSerializable
     }
 
     /**
-     * Optional namespace declarations
+     * Optionally define rules to convert a prop name to a tag
      *
-     * @return array
+     * @param string $prop
+     * @return string
      */
-    protected function xmlSerializeNamespaces(): array
+    protected function xmlSerializePropToTag(string $prop): string
     {
-        $ns = $this->namespace();
+        $converter = "${prop}Tag";
 
-        if (is_array($ns)) {
-            return $ns;
-        } elseif (is_string($ns)) {
-            return [ $ns ];
+        if (!method_exists($this, $converter)) {
+            return $prop;
         }
-
-        return [];
+        
+        return $this->{$converter}();
     }
 
     /**
-     * Optionally define namespace for this Message
+     * Optional namespace declarations
      *
-     * @return mixed
+     * @param string $prop
+     * @return string
      */
-    protected function namespace()
+    protected function xmlSerializeNamespacePrefix(string $prop): string
     {
-        return null;
+        $ns = "${prop}Namespace";
+
+        if (method_exists($this, $ns)) {
+            return $this->{$ns}();
+        }
+        
+        return $this->namespace();
+    }
+
+    /**
+     * Optionally define namespace for this Message's elements
+     *
+     * @return string
+     */
+    protected function namespace(): string
+    {
+        return '';
+    }
+
+    /**
+     * Optionally define attributes for this Message
+     *
+     * @return array
+     */
+    protected function attributes(): array
+    {
+        return [];
     }
 }

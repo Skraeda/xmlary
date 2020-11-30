@@ -88,7 +88,7 @@ class XmlSerializeTest extends TestCase
 
             protected $el = 'value';
 
-            protected function xmlSerializeAttributes(string $prop): array
+            protected function xmlSerializeAttributes(?string $prop = null): array
             {
                 return [
                     'foo' => 'bar'
@@ -116,5 +116,39 @@ class XmlSerializeTest extends TestCase
         $arr = $o->xmlSerialize()[get_class($o)];
         $this->assertEquals('value', $arr['el']);
         $this->assertEquals(['o', 'p'], $arr['@namespace']);
+    }
+
+    /** @test */
+    public function itCanAddNamespacePrefix()
+    {
+        $o = new class {
+            use XmlSerialize;
+
+            protected $el = 'value';
+
+            protected function xmlSerializeNamespacePrefix(): string
+            {
+                return 'foo';
+            }
+        };
+        $arr = $o->xmlSerialize()[get_class($o)];
+        $this->assertEquals('value', $arr['foo:el']);
+    }
+
+    /** @test */
+    public function itCanChangeTag()
+    {
+        $o = new class {
+            use XmlSerialize;
+
+            protected $el = 'value';
+
+            protected function xmlSerializePropToTag(string $prop): string
+            {
+                return 'ELEMENT';
+            }
+        };
+        $arr = $o->xmlSerialize()[get_class($o)];
+        $this->assertEquals('value', $arr['ELEMENT']);
     }
 }
