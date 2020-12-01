@@ -41,7 +41,7 @@ abstract class XmlMessage implements XmlSerializable
     protected function xmlSerializeAttributes(?string $prop = null): array
     {
         if (!$prop) {
-            return $this->attributes();
+            return $this->attributesWithNamespace($this->attributes());
         }
 
         $accessor = "${prop}Attributes";
@@ -50,7 +50,7 @@ abstract class XmlMessage implements XmlSerializable
             return [];
         }
         
-        return $this->{$accessor}();
+        return $this->attributesWithNamespace($this->{$accessor}());
     }
 
     /**
@@ -88,7 +88,7 @@ abstract class XmlMessage implements XmlSerializable
     }
 
     /**
-     * Optionally define namespace for this Message's elements
+     * Optionally define a global namespace for this Message's elements
      *
      * @return string
      */
@@ -105,5 +105,28 @@ abstract class XmlMessage implements XmlSerializable
     protected function attributes(): array
     {
         return [];
+    }
+
+    /**
+     * Add Namespace to attributes
+     *
+     * @var array $attributes
+     * @return array
+     */
+    protected function attributesWithNamespace(array $attributes): array
+    {
+        $ns = $this->namespace();
+
+        if (!$ns) {
+            return $attributes;
+        }
+
+        $nsAttr = [];
+
+        foreach ($attributes as $key => $value) {
+            $nsAttr[$ns.':'.$key] = $value;
+        }
+
+        return $nsAttr;
     }
 }

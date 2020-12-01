@@ -40,12 +40,8 @@ trait XmlSerialize
             }
         }
 
-        if ($namespaces = $this->xmlSerializeNamespaces()) {
-            $xml[$this->xmlSerializeNamespaceKeyword()] = $namespaces;
-        }
-
         if ($attributes = $this->xmlSerializeAttributes()) {
-            $xml['@attributes'] = $attributes;
+            $xml[$this->xmlSerializeAttributeKeyword()] = $attributes;
         }
 
         return [ $c->getShortName() => $xml ];
@@ -139,15 +135,5 @@ trait XmlSerialize
     protected function xmlSerializeValueKeyword(): string
     {
         return '@value';
-    }
-
-    /**
-     * Optional override for Namespace keyword
-     *
-     * @return string
-     */
-    protected function xmlSerializeNamespaceKeyword(): string
-    {
-        return '@namespace';
     }
 }
