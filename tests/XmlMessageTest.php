@@ -177,4 +177,34 @@ class XmlMessageTest extends TestCase
         $arr = $o->xmlSerialize()[get_class($o)];
         $this->assertEquals('bar', $arr['@attributes']['foo']);
     }
+
+    /** @test */
+    public function itCanDefineNamespaceForAllAttributes()
+    {
+        $o = new class extends XmlMessage {
+            protected $el = 'foo';
+            
+            protected function elAttributes(): array
+            {
+                return [
+                    'bar' => 'x'
+                ];
+            }
+
+            protected function namespace(): string
+            {
+                return 'c';
+            }
+
+            protected function attributes(): array
+            {
+                return [
+                    'one' => 'two'
+                ];
+            }
+        };
+        $arr = $o->xmlSerialize()[get_class($o)];
+        $this->assertEquals('two', $arr['@attributes']['c:one']);
+        $this->assertEquals('x', $arr['c:el']['@attributes']['c:bar']);
+    }
 }

@@ -101,24 +101,6 @@ class XmlSerializeTest extends TestCase
     }
 
     /** @test */
-    public function itCanSerializeWithNamespace()
-    {
-        $o = new class {
-            use XmlSerialize;
-
-            protected $el = 'value';
-
-            protected function xmlSerializeNamespaces(): array
-            {
-                return ['o', 'p'];
-            }
-        };
-        $arr = $o->xmlSerialize()[get_class($o)];
-        $this->assertEquals('value', $arr['el']);
-        $this->assertEquals(['o', 'p'], $arr['@namespace']);
-    }
-
-    /** @test */
     public function itCanAddNamespacePrefix()
     {
         $o = new class {

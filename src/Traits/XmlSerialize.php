@@ -73,17 +73,7 @@ trait XmlSerialize
     {
         return $val;
     }
-
-    /**
-     * Optional namespace declarations
-     *
-     * @return array
-     */
-    protected function xmlSerializeNamespaces(): array
-    {
-        return [];
-    }
-
+    
     /**
      * Optional attribute declarations
      *
