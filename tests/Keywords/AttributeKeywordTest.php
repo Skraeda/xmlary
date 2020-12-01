@@ -77,6 +77,22 @@ class AttributeKeywordTest extends TestCase
         }
     }
 
+    /** @test */
+    public function itCanCreateAttributesWithNamespace()
+    {
+        $name = 'foo';
+        $value = 'bar';
+        $this->validator->shouldReceive('validateAttribute')->with($name, $value);
+        $keyword = new AttributeKeyword($this->validator, [
+            'o' => 'http://example.com'
+        ]);
+        $attributes = [ 'o:'.$name => $value ];
+
+        $keyword->handle($this->document, $this->node, $attributes);
+
+        $this->assertEquals($value, $this->node->getAttributeNS('http://example.com', $name));
+    }
+
     /**
      * Attribute data provider.
      *

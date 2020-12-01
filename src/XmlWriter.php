@@ -3,6 +3,7 @@
 namespace Skraeda\Xmlary;
 
 use DOMDocument;
+use DOMElement;
 use DOMNode;
 use Skraeda\Xmlary\Contracts\XmlKeyword;
 use Skraeda\Xmlary\Contracts\XmlWriterConfigurationContract;
@@ -14,6 +15,7 @@ use Skraeda\Xmlary\Exceptions\XmlWriterException;
 use Skraeda\Xmlary\Keywords\AttributeKeyword;
 use Skraeda\Xmlary\Keywords\CDataKeyword;
 use Skraeda\Xmlary\Keywords\CommentKeyword;
+use Skraeda\Xmlary\Keywords\NamespaceKeyword;
 use Skraeda\Xmlary\Keywords\ValueKeyword;
 use Throwable;
 
@@ -59,6 +61,13 @@ class XmlWriter implements XmlWriterContract
      * @var array
      */
     protected $keywordHandlers = [];
+
+    /**
+     * Defined namespaces
+     *
+     * @var array
+     */
+    protected $namespaces = [];
     
     /**
      * Middlewares.
@@ -96,8 +105,22 @@ class XmlWriter implements XmlWriterContract
     {
         return $this->extend('value', new ValueKeyword($this->converter))
                     ->extend('cdata', new CDataKeyword)
-                    ->extend('attributes', new AttributeKeyword($this->validator))
+                    ->extend('attributes', new AttributeKeyword($this->validator, $this->namespaces))
                     ->extend('comment', new CommentKeyword);
+    }
+
+    /**
+     * Add a namespace
+     *
+     * @var string $namespaceUri
+     * @var string $prefix
+     * @return self
+     */
+    public function namespace(string $namespaceUri, string $prefix): self
+    {
+        $this->namespaces[$prefix] = $namespaceUri;
+
+        return $this;
     }
 
     /**
@@ -334,7 +357,7 @@ class XmlWriter implements XmlWriterContract
      */
     protected function buildNodeBranch(DOMDocument $doc, DOMNode $parent, string $key, array $data): void
     {
-        $child = $doc->createElement($key);
+        $child = $this->createElement($doc, $key);
         $this->buildDomTree($doc, $child, $data);
         $parent->appendChild($child);
     }
@@ -350,7 +373,7 @@ class XmlWriter implements XmlWriterContract
      */
     protected function buildNodeLeaf(DOMDocument $doc, DOMNode $parent, string $key, $value): void
     {
-        $parent->appendChild($doc->createElement($key, $this->converter->convert($value)));
+        $parent->appendChild($this->createElement($doc, $key, $value));
     }
 
     /**
@@ -362,5 +385,51 @@ class XmlWriter implements XmlWriterContract
     protected function middlewares(string $context): array
     {
         return array_reverse($this->middleware[$context]);
+    }
+
+    /**
+     * Get Namespace URI from tag
+     *
+     * @param string $tag
+     * @return string|null
+     */
+    protected function getTagNamespace(string $tag): ?string
+    {
+        $parts = explode(':', $tag);
+
+        if (count($parts) !== 2) {
+            return null;
+        }
+
+        return $this->lookupNamespace($parts[0]);
+    }
+
+    /**
+     * Lookup a namespace from the namespace prefix
+     *
+     * @var string $prefix
+     * @return string|null
+     */
+    protected function lookupNamespace(string $prefix): ?string
+    {
+        return $this->namespaces[$prefix] ?? null;
+    }
+
+    /**
+     * Create an Element
+     *
+     * @param \DOMDocument
+     * @var string $key
+     * @var mixed $value
+     */
+    protected function createElement(DOMDocument $doc, string $key, $value = null): DOMElement
+    {
+        $convertedValue = $value === null ? $value : $this->converter->convert($value);
+
+        if ($ns = $this->getTagNamespace($key)) {
+            return $doc->createElementNS($ns, $key, $convertedValue);
+        }
+        
+        return $doc->createElement($key, $convertedValue);
     }
 }

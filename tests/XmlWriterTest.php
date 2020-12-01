@@ -143,6 +143,29 @@ class XmlWriterTest extends TestCase
         $this->assertEquals($this->validator, $writer->getValidator());
     }
 
+    /** @test */
+    public function itCanCreateElementsWithNamespace()
+    {
+        $writer = (new XmlWriter)->bootstrap()
+            ->namespace('xmlns', 'http://www.w3.org/2000/xmlns/')
+            ->namespace('o', 'http://example.com');
+
+        $str = $writer->toString([
+            'o:Root' => [
+                '@attributes' => [
+                    'xmlns:o' => 'http://example.com'
+                ],
+                'o:Next' => [
+                    '@attributes' => [
+                        'o:nil' => 'true'
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->assertEquals('<o:Root xmlns:o="http://example.com"><o:Next o:nil="true"/></o:Root>', $str);
+    }
+
     /**
      * Data provider for Array to XML conversion.
      *

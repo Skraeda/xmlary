@@ -22,13 +22,21 @@ class AttributeKeyword implements XmlKeyword
     protected $validator;
 
     /**
+     * Namespaces lookup map
+     *
+     * @var array
+     */
+    protected $namespaces;
+
+    /**
      * Constructor.
      *
      * @param \Skraeda\Xmlary\Contracts\XmlValidatorContract $validator
      */
-    public function __construct(XmlValidatorContract $validator)
+    public function __construct(XmlValidatorContract $validator, array $namespaces = [])
     {
         $this->validator = $validator;
+        $this->namespaces = $namespaces;
     }
 
     /**
@@ -37,10 +45,32 @@ class AttributeKeyword implements XmlKeyword
     public function handle(DOMDocument $doc, DOMNode $parent, $value): void
     {
         foreach ($value as $name => $v) {
-            $this->validator->validateAttribute($name, $v);
-            $attribute = $doc->createAttribute($name);
+            [ 'ns' => $ns, 'tag' => $tag ] = $this->parseAttribute($name);
+            $this->validator->validateAttribute($tag, $v);
+            if ($ns !== null && array_key_exists($ns, $this->namespaces)) {
+                $attribute = $doc->createAttributeNS($this->namespaces[$ns], $name);
+            } else {
+                $attribute = $doc->createAttribute($name);
+            }
             $attribute->value = $v;
             $parent->appendChild($attribute);
+        }
+    }
+
+
+    protected function parseAttribute(string $name): array
+    {
+        $parts = explode(':', $name);
+
+        if (count($parts) === 2) {
+            return [
+                'ns' => $parts[0],
+                'tag' => $parts[1]
+            ];
+        } else {
+            return [
+                'tag' => $name
+            ];
         }
     }
 }
