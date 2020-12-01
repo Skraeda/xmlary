@@ -19,9 +19,7 @@ class NamespaceKeyword implements XmlKeyword
      *
      * @var array
      */
-    protected $namespaces = [
-        'xmlns' => 'http://www.w3.org/2000/xmlns/'
-    ];
+    protected $namespaces = [];
 
     /**
      * Constructor
@@ -30,9 +28,7 @@ class NamespaceKeyword implements XmlKeyword
      */
     public function __construct(array $namespaces = [])
     {
-        foreach ($namespaces as $namespace => $uri) {
-            $this->namespaces[$namespace] = $uri;
-        }
+        $this->namespaces = $namespaces;
     }
 
     /**
@@ -43,11 +39,39 @@ class NamespaceKeyword implements XmlKeyword
         if ($parent instanceof DOMElement) {
             if (is_array($value)) {
                 foreach ($value as $ns) {
-                    $parent->setAttributeNS($this->namespaces['xmlns'], 'xmlns:'.$ns, $this->namespaces[$ns]);
+                    $this->setAttributeNS($parent, $ns);
                 }
             } else {
-                $parent->setAttributeNS($this->namespaces['xmlns'], 'xmlns:'.$value, $this->namespaces[$value]);
+                $this->setAttributeNS($parent, $value);
             }
         }
+    }
+
+    /**
+     * Set attribute NS to parent
+     *
+     * @param \DOMElement $parent
+     * @param mixed $value
+     * @return void
+     */
+    protected function setAttributeNS(DOMElement $parent, $value): void
+    {
+        if (is_array($value)) {
+            [
+                'value' => $prefix,
+                'namespace' => $namespace
+            ] = $value;
+        } else {
+            $prefix = (string) $value;
+        }
+
+        if (!isset($namespace) || !$namespace) {
+            $keys = array_keys($this->namespaces);
+            $namespace = reset($keys);
+        }
+
+        $qn = sprintf("%s:%s", $namespace, $prefix);
+
+        $parent->setAttributeNS($this->namespaces[$namespace], $qn, $this->namespaces[$prefix]);
     }
 }
