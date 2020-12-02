@@ -57,7 +57,12 @@ class AttributeKeyword implements XmlKeyword
         }
     }
 
-
+    /**
+     * Parse attribute qualified name to namespace and tag
+     *
+     * @param string $name
+     * @return array
+     */
     protected function parseAttribute(string $name): array
     {
         $parts = explode(':', $name);
