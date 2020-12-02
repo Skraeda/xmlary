@@ -15,7 +15,6 @@ use Skraeda\Xmlary\Exceptions\XmlWriterException;
 use Skraeda\Xmlary\Keywords\AttributeKeyword;
 use Skraeda\Xmlary\Keywords\CDataKeyword;
 use Skraeda\Xmlary\Keywords\CommentKeyword;
-use Skraeda\Xmlary\Keywords\NamespaceKeyword;
 use Skraeda\Xmlary\Keywords\ValueKeyword;
 use Throwable;
 
