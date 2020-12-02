@@ -358,8 +358,8 @@ class XmlWriter implements XmlWriterContract
     protected function buildNodeBranch(DOMDocument $doc, DOMNode $parent, string $key, array $data): void
     {
         $child = $this->createElement($doc, $key);
-        $this->buildDomTree($doc, $child, $data);
         $parent->appendChild($child);
+        $this->buildDomTree($doc, $child, $data);
     }
 
     /**
