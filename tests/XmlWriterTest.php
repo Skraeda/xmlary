@@ -146,9 +146,10 @@ class XmlWriterTest extends TestCase
     /** @test */
     public function itCanCreateElementsWithNamespace()
     {
-        $writer = (new XmlWriter)->bootstrap()
+        $writer = (new XmlWriter)
             ->namespace('xmlns', 'http://www.w3.org/2000/xmlns/')
-            ->namespace('o', 'http://example.com');
+            ->namespace('o', 'http://example.com')
+            ->bootstrap();
 
         $str = $writer->toString([
             'o:Root' => [
