@@ -12,8 +12,8 @@ abstract class XmlElement extends XmlMessage
     /**
      * {@inheritDoc}
      */
-    public function xmlSerialize(): array
+    protected function xmlSerializeRootName(): ?string
     {
-        return reset(parent::xmlSerialize());
+        return null;
     }
 }

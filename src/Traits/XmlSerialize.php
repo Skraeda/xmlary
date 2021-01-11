@@ -44,7 +44,13 @@ trait XmlSerialize
             $xml[$this->xmlSerializeAttributeKeyword()] = $attributes;
         }
 
-        return [ $c->getShortName() => $xml ];
+        $root = $this->xmlSerializeRootName();
+
+        if (!$root) {
+            return $xml;
+        }
+
+        return [ $root => $xml ];
     }
 
     /**
@@ -125,5 +131,15 @@ trait XmlSerialize
     protected function xmlSerializeValueKeyword(): string
     {
         return '@value';
+    }
+
+    /**
+     * Specify a name for the root element
+     *
+     * @return string|null
+     */
+    protected function xmlSerializeRootName(): ?string
+    {
+        return (new ReflectionClass($this))->getShortName();
     }
 }

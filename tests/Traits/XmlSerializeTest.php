@@ -133,4 +133,37 @@ class XmlSerializeTest extends TestCase
         $arr = $o->xmlSerialize()[get_class($o)];
         $this->assertEquals('value', $arr['ELEMENT']);
     }
+
+    /** @test */
+    public function itCanSpecifyANewRootName()
+    {
+        $o = new class {
+            use XmlSerialize;
+
+            protected $el = 'value';
+
+            protected function xmlSerializeRootName(): ?string
+            {
+                return 'Foo';
+            }
+        };
+        $arr = $o->xmlSerialize()['Foo'];
+        $this->assertEquals('value', $arr['el']);
+    }
+
+    /** @test */
+    public function itCanSpecifyNullRootName()
+    {
+        $o = new class {
+            use XmlSerialize;
+
+            protected $el = 'value';
+
+            protected function xmlSerializeRootName(): ?string
+            {
+                return null;
+            }
+        };
+        $this->assertEquals('value', $o->xmlSerialize()['el']);
+    }
 }
