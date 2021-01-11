@@ -74,6 +74,7 @@ class AttributeKeyword implements XmlKeyword
             ];
         } else {
             return [
+                'ns' => null,
                 'tag' => $name
             ];
         }
