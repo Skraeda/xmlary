@@ -206,6 +206,7 @@ You can use the `bootstrap` method on the writer to configure it with default ke
 * `value`: Set element value (Useful if using other keywords in the same node)
 * `cdata`: Wraps a value in CDATA block
 * `comment`: Wraps a value in comment block
+* `handler`: Add a customer function handler for a node block
 
 #### Example
 ```php
@@ -230,6 +231,11 @@ $arr = [
         'Comment' => [
             '@value' => 'Value',
             '@comment' => 'Comment'
+        ],
+        'Handler' => [
+            '@handler' => function (DOMDocument $doc, DOMNode $parent) {
+                $parent->appendChild($doc->createElement('Name', 'Value'));
+            }
         ]
     ]
 ];
