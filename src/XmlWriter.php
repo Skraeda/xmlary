@@ -15,6 +15,7 @@ use Skraeda\Xmlary\Exceptions\XmlWriterException;
 use Skraeda\Xmlary\Keywords\AttributeKeyword;
 use Skraeda\Xmlary\Keywords\CDataKeyword;
 use Skraeda\Xmlary\Keywords\CommentKeyword;
+use Skraeda\Xmlary\Keywords\HandlerKeyword;
 use Skraeda\Xmlary\Keywords\ValueKeyword;
 use Throwable;
 
@@ -105,7 +106,8 @@ class XmlWriter implements XmlWriterContract
         return $this->extend('value', new ValueKeyword($this->converter))
                     ->extend('cdata', new CDataKeyword)
                     ->extend('attributes', new AttributeKeyword($this->validator, $this->namespaces))
-                    ->extend('comment', new CommentKeyword);
+                    ->extend('comment', new CommentKeyword)
+                    ->extend('handler', new HandlerKeyword);
     }
 
     /**
