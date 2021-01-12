@@ -7,7 +7,7 @@
         "test": "vendor/bin/phpunit",
         "test:coverage": "vendor/bin/phpunit --coverage-html=coverage --log-junit coverage/report.xml"
     },
-    "version": "v1.3.3",
+    "version": "v1.4.0",
     "authors": [
         {
             "name": "Gunnar Örn Baldursson",
